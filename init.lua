@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -176,10 +176,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
+vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
+vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
+vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
@@ -407,7 +407,35 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
-
+  { -- nvim-java Java Configurations
+    'nvim-java/nvim-java',
+    dependencies = {
+      'nvim-java/lua-async-await',
+      'nvim-java/nvim-java-refactor',
+      'nvim-java/nvim-java-core',
+      'nvim-java/nvim-java-test',
+      'nvim-java/nvim-java-dap',
+      'MunifTanjim/nui.nvim',
+      'neovim/nvim-lspconfig',
+      'mfussenegger/nvim-dap',
+      {
+        'williamboman/mason.nvim',
+        opts = {
+          registries = {
+            'github:nvim-java/mason-registry',
+            'github:mason-org/mason-registry',
+          },
+        },
+      },
+    },
+    config = function()
+      local builtin = require 'java'
+      vim.keymap.set('n', '<leader>jtc', builtin.test.run_current_class, { desc = '[J]ava [T]est current [C]lass' })
+      vim.keymap.set('n', '<leader>jtm', builtin.test.run_current_method, { desc = '[J]ava [T]est current [M]ethod' })
+      vim.keymap.set('n', '<leader>jdc', builtin.test.debug_current_class, { desc = '[J]ava [D]ebug current [C]lass' })
+      vim.keymap.set('n', '<leader>jdm', builtin.test.debug_current_method, { desc = '[J]ava [T]est current [M]ethod' })
+    end,
+  },
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -622,6 +650,8 @@ require('lazy').setup({
           end,
         },
       }
+      require('java').setup()
+      require('lspconfig').jdtls.setup {}
     end,
   },
 
@@ -862,6 +892,22 @@ require('lazy').setup({
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
+  },
+  { -- asciidoc preview plugin
+    'tigion/nvim-asciidoc-preview',
+    cmd = { 'AsciiDocPreview' },
+    ft = { 'asciidoc' },
+    build = 'cd server && npm install',
+    opts = { -- Add user configuration here
+      server = {
+        converter = 'js',
+      },
+      preview = {
+        position = 'current',
+      },
+    },
+
+    vim.keymap.set('n', '<Leader>cp', ':AsciiDocPreview<CR>', { desc = 'Preview AsciiDoc document' }),
   },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
